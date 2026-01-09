@@ -47,6 +47,7 @@ def analizar_prod_mas_vendido():
         "Codigo"  : int(id_mas_vendido.idxmax()),
         "Cantidad vendida": int(cantidad_total_vendida),
         "Descripción": nombre_producto,
+        
         },
     }
     
@@ -128,18 +129,41 @@ def productos_menos_vendidos():
         "stock": i.stock
     } for i in inventario])
     
-    df_ventas_inventario = pd.merge(df_inventario,df_ventas,left_on="id",right_on="prod_id",how="inner", )
-    
-    df_ventas_inventario.fillna(0, inplace=True)
+    df_ventas_inventario = pd.merge(df_inventario,df_ventas,left_on="id",right_on="prod_id",how="outer" )
     
     
-    id_menos_vendido = df_ventas_inventario.groupby("nombre")["cantidad"].sum().sort_values()
+    df_ventas_inventario["cantidad"].fillna(0, inplace=True)
     
-    ranking = id_menos_vendido.to_dict()
+
+    
+    ranking = (
+        df_ventas_inventario.groupby(["id","nombre"])["cantidad"].sum().sort_values().head(3)
+    )
+    
+    resultado = []
+    
+    
+    
+    for (id_prod, nombre),cantidad in ranking.items():
+        if cantidad == 0:
+            mensaje = "Priorizar Marketing Urgente"
+        elif cantidad >= 1 and cantidad <= 3:
+            mensaje = "Poner en promoción"
+        elif cantidad >= 4 and cantidad <= 7:
+            mensaje = "Revisar precio"
+        else:
+            mensaje = "Sin acción"
+    
+        resultado.append({
+            "id": int(id_prod),
+            "nombre": nombre,
+            "cantidad vendida": int(cantidad),
+            "recomendacion": mensaje
+        })
+    
     
     return {"Descripción": "Ranking de los productos menos vendidos",
-            "Ranking": ranking,
-            
+            "Resultado": resultado
             }
     
     

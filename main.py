@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import *
-from models import ProductoDB
+from models import *
 from endpoints import productos, ventas, analisis , actualizar
 
 
