@@ -167,3 +167,33 @@ def productos_menos_vendidos():
             }
     
     
+#Análisis de cantidad vendida total en dinero
+    
+@router.get("/analisis/monto-total-vendido")
+    
+def total_vendido():
+    inventario, ventas = levantar_sesion()
+    
+    df_ventas = pd.DataFrame([{
+        "prod_id": v.producto_id,
+        "cantidad": v.cantidad
+    } for v in ventas])
+    
+    df_inventario = pd.DataFrame([{
+        "id": i.id,
+        "nombre": i.nombre,
+        "precio": i.precio,
+        "stock": i.stock
+    } for i in inventario])
+    
+    df_ventas_inventario = pd.merge(df_inventario,df_ventas,left_on="id",right_on="prod_id",how="outer" )
+    
+    
+    df_ventas_inventario["cantidad"].fillna(0, inplace=True)
+    
+    
+    total_vendido_por_producto = df_ventas_inventario["cantidad"] * df_ventas_inventario["precio"]
+    
+    total = total_vendido_por_producto.sum()
+    
+    return total
