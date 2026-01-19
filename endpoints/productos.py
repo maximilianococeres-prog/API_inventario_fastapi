@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from schemas import Producto
 from database import SessionLocal
 from models import ProductoDB
@@ -10,7 +10,7 @@ router = APIRouter()
 
 def crear_producto(producto: Producto):
     db = SessionLocal()
-    producto_db = ProductoDB(nombre = producto.nombre, precio = producto.precio, stock = producto.stock)
+    producto_db = ProductoDB(nombre = producto.nombre, precio = producto.precio, stock = producto.stock, descripcion = producto.descripcion)
     try:
         db.add(producto_db)
         db.commit()
@@ -26,5 +26,10 @@ def crear_producto(producto: Producto):
 def leer_inventario():
     db = SessionLocal()
     inventario = db.query(ProductoDB).all()
-    db.close()
+    
+    if not inventario:
+        db.close()
+        raise HTTPException(status_code=400, detail="No hay Inventario")
+        
+   
     return inventario

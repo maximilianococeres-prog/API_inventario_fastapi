@@ -9,6 +9,7 @@ class ProductoDB(Base):
     nombre = Column(String, nullable=False)
     precio = Column(Float, nullable=False)
     stock = Column(Integer,nullable=False)
+    descripcion = Column(String,nullable = False)
     
     
     

@@ -20,9 +20,20 @@ def actualizar_stock(actualizar: Actualizar):
         raise HTTPException(status_code= 404, detail = "Producto no encontrado")
     
     
-    producto.stock += actualizar.cantidad
+    #actualizacion de la cantidad del stock
     
-    actualizar_db = ActualizarDB(producto_id = actualizar.producto_id, cantidad = actualizar.cantidad)
+    cantidad_actual = actualizar.cantidad
+    
+    
+    producto.stock += cantidad_actual
+    
+    if producto.stock + cantidad_actual < 0:
+        raise HTTPException(400, "Stock insuficiente")
+
+    
+    actualizar_db = ActualizarDB(producto_id = actualizar.producto_id, cantidad = cantidad_actual)
+    
+    
     
     try:
         db.add(actualizar_db)
